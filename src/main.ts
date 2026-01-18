@@ -51,6 +51,10 @@ const currentPhiSpan = document.getElementById("current-phi")!;
 const proposalMessage = document.getElementById("proposal-message")!;
 const loadingOverlay = document.getElementById("loading-overlay")!;
 const controls = document.getElementById("controls")!;
+const mobileCoords = document.getElementById("mobile-coords")!;
+const mobileThetaSpan = document.getElementById("mobile-theta")!;
+const mobilePhiSpan = document.getElementById("mobile-phi")!;
+const mobileHint = document.getElementById("mobile-hint")!;
 
 function init(): void {
   // Scene
@@ -108,6 +112,13 @@ function checkAllLoaded(): void {
   // Show controls after a short delay
   setTimeout(() => {
     controls.classList.add("visible");
+    mobileCoords.classList.add("visible");
+    mobileHint.classList.add("visible");
+
+    // Hide hint after 4 seconds
+    setTimeout(() => {
+      mobileHint.classList.remove("visible");
+    }, 4000);
   }, 500);
 }
 
@@ -436,6 +447,9 @@ function handleTouchStart(event: TouchEvent): void {
   const touch = event.touches[0]!;
   previousMouseX = touch.clientX;
   previousMouseY = touch.clientY;
+
+  // Hide hint on first interaction
+  mobileHint.classList.remove("visible");
 }
 
 function handleTouchMove(event: TouchEvent): void {
@@ -483,6 +497,8 @@ function updateCameraPosition(): void {
   // Update display
   currentThetaSpan.textContent = Math.round(currentTheta).toString();
   currentPhiSpan.textContent = Math.round(currentPhi).toString();
+  mobileThetaSpan.textContent = Math.round(currentTheta).toString();
+  mobilePhiSpan.textContent = Math.round(currentPhi).toString();
 
   // Check if we should show/hide the proposal
   checkProposalReveal();

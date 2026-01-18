@@ -205,6 +205,71 @@
         50% { opacity: 1; }
       }
 
+      /* Mobile UI */
+      #mobile-coords {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 10px 16px;
+        border-radius: 20px;
+        color: white;
+        font-size: 14px;
+        z-index: 100;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+        pointer-events: none;
+      }
+
+      #mobile-coords.visible {
+        opacity: 1;
+      }
+
+      #mobile-hint {
+        display: none;
+        position: fixed;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        padding: 12px 24px;
+        border-radius: 24px;
+        color: white;
+        font-size: 16px;
+        letter-spacing: 1px;
+        z-index: 100;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+        pointer-events: none;
+      }
+
+      #mobile-hint.visible {
+        opacity: 1;
+      }
+
+      /* Mobile media query */
+      @media (max-width: 768px) {
+        #controls {
+          display: none !important;
+        }
+
+        #mobile-coords {
+          display: block;
+        }
+
+        #mobile-hint {
+          display: block;
+        }
+
+        #proposal-message {
+          font-size: 32px;
+          padding: 0 20px;
+        }
+      }
+
     </style>
   </head>
   <body>
@@ -232,6 +297,12 @@
     </div>
 
     <div id="proposal-message">Will you marry me?</div>
+
+    <div id="mobile-coords">
+      <span id="mobile-theta">0</span>°, <span id="mobile-phi">90</span>°
+    </div>
+
+    <div id="mobile-hint">drag to explore</div>
 
     <script type="module" src="/src/main.ts"></script>
   </body>
