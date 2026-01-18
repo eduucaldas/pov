@@ -93,7 +93,7 @@ function init(): void {
 function loadHorseModel(): void {
   const loader = new OBJLoader();
   loader.load(
-    "/horse/16267_American_Paint_Horse_Nuetral_new.obj",
+    "horse/16267_American_Paint_Horse_Nuetral_new.obj",
     (object) => {
       // Collect all vertices from the loaded model
       const allVertices: THREE.Vector3[] = [];
@@ -283,7 +283,7 @@ function createCamouflageStars(): void {
 function createRingConstellation(): void {
   const loader = new OBJLoader();
   loader.load(
-    "/ring/the_crowned_ring.obj",
+    "ring/the_crowned_ring.obj",
     (object) => {
       const allVertices: THREE.Vector3[] = [];
 
