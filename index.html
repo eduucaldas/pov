@@ -42,6 +42,14 @@
         border-radius: 12px;
         color: white;
         z-index: 100;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+        pointer-events: none;
+      }
+
+      #controls.visible {
+        opacity: 1;
+        pointer-events: auto;
       }
 
       #controls h2 {
@@ -164,9 +172,46 @@
       #proposal-message.visible {
         opacity: 1;
       }
+
+      #loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        transition: opacity 1.5s ease-out;
+      }
+
+      #loading-overlay.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      #loading-text {
+        color: white;
+        font-size: 24px;
+        font-weight: 300;
+        letter-spacing: 2px;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
+      }
+
     </style>
   </head>
   <body>
+    <div id="loading-overlay">
+      <div id="loading-text">loading the universe, just for you...</div>
+    </div>
+
     <div id="app"></div>
 
     <div id="controls">

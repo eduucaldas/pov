@@ -30,6 +30,9 @@ let isAnimating = false;
 let isDragging = false;
 let previousMouseX = 0;
 let previousMouseY = 0;
+let isLoaded = false;
+let horseLoaded = false;
+let ringLoaded = false;
 
 // Three.js objects
 let scene: THREE.Scene;
@@ -46,6 +49,8 @@ const goButton = document.getElementById("go-button")!;
 const currentThetaSpan = document.getElementById("current-theta")!;
 const currentPhiSpan = document.getElementById("current-phi")!;
 const proposalMessage = document.getElementById("proposal-message")!;
+const loadingOverlay = document.getElementById("loading-overlay")!;
+const controls = document.getElementById("controls")!;
 
 function init(): void {
   // Scene
@@ -66,10 +71,9 @@ function init(): void {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   app.appendChild(renderer.domElement);
 
-  // Load horse model and create stars from vertices
+  // Load horse model and ring model
   loadHorseModel();
   createRingConstellation();
-  createCamouflageStars();
 
   // Event listeners
   goButton.addEventListener("click", handleGo);
@@ -88,6 +92,23 @@ function init(): void {
 
   // Start render loop
   animate();
+}
+
+function checkAllLoaded(): void {
+  if (!horseLoaded || !ringLoaded || isLoaded) return;
+
+  isLoaded = true;
+
+  // Create camouflage stars now that everything is loaded
+  createCamouflageStars();
+
+  // Fade out loading overlay
+  loadingOverlay.classList.add("hidden");
+
+  // Show controls after a short delay
+  setTimeout(() => {
+    controls.classList.add("visible");
+  }, 500);
 }
 
 function loadHorseModel(): void {
@@ -117,14 +138,16 @@ function loadHorseModel(): void {
 
       // Create stars from sampled vertices
       createHorseStars(allVertices);
+      horseLoaded = true;
+      checkAllLoaded();
     },
-    (progress) => {
-      console.log(`Loading: ${((progress.loaded / progress.total) * 100).toFixed(1)}%`);
-    },
+    undefined,
     (error) => {
       console.error("Error loading horse model:", error);
       // Fallback to random stars
       createRandomStars();
+      horseLoaded = true;
+      checkAllLoaded();
     }
   );
 }
@@ -305,10 +328,14 @@ function createRingConstellation(): void {
       });
 
       createRingStars(allVertices);
+      ringLoaded = true;
+      checkAllLoaded();
     },
     undefined,
     (error) => {
       console.error("Error loading ring model:", error);
+      ringLoaded = true;
+      checkAllLoaded();
     }
   );
 }
@@ -363,7 +390,7 @@ function createRingStars(vertices: THREE.Vector3[]): void {
 
 // Mouse controls
 function handleMouseDown(event: MouseEvent): void {
-  if (isAnimating) return;
+  if (!isLoaded || isAnimating) return;
   isDragging = true;
   previousMouseX = event.clientX;
   previousMouseY = event.clientY;
@@ -371,7 +398,7 @@ function handleMouseDown(event: MouseEvent): void {
 }
 
 function handleMouseMove(event: MouseEvent): void {
-  if (!isDragging || isAnimating) return;
+  if (!isLoaded || !isDragging || isAnimating) return;
 
   const deltaX = event.clientX - previousMouseX;
   const deltaY = event.clientY - previousMouseY;
@@ -404,7 +431,7 @@ function handleMouseUp(): void {
 
 // Touch controls
 function handleTouchStart(event: TouchEvent): void {
-  if (isAnimating || event.touches.length !== 1) return;
+  if (!isLoaded || isAnimating || event.touches.length !== 1) return;
   isDragging = true;
   const touch = event.touches[0]!;
   previousMouseX = touch.clientX;
@@ -412,7 +439,7 @@ function handleTouchStart(event: TouchEvent): void {
 }
 
 function handleTouchMove(event: TouchEvent): void {
-  if (!isDragging || isAnimating || event.touches.length !== 1) return;
+  if (!isLoaded || !isDragging || isAnimating || event.touches.length !== 1) return;
   event.preventDefault();
 
   const touch = event.touches[0]!;
@@ -462,7 +489,7 @@ function updateCameraPosition(): void {
 }
 
 function handleGo(): void {
-  if (isAnimating) return;
+  if (!isLoaded || isAnimating) return;
 
   const targetTheta = parseFloat(thetaInput.value) || 0;
   const targetPhi = parseFloat(phiInput.value) || 90;
