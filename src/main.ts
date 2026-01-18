@@ -558,16 +558,27 @@ function animateTo(targetTheta: number, targetPhi: number): void {
 }
 
 function checkProposalReveal(): void {
-  const thetaDiff = Math.abs(currentTheta - SECRET_THETA);
-  const phiDiff = Math.abs(currentPhi - SECRET_PHI);
+  // Check primary angle
+  const thetaDiff1 = Math.abs(currentTheta - SECRET_THETA);
+  const phiDiff1 = Math.abs(currentPhi - SECRET_PHI);
+  const thetaDiffWrapped1 = Math.min(thetaDiff1, 360 - thetaDiff1);
 
-  // Account for theta wrapping
-  const thetaDiffWrapped = Math.min(thetaDiff, 360 - thetaDiff);
+  // Check opposite angle (ring is visible from both sides of the projection)
+  const oppositeTheta = (SECRET_THETA + 180) % 360;
+  const oppositePhi = 180 - SECRET_PHI;
+  const thetaDiff2 = Math.abs(currentTheta - oppositeTheta);
+  const phiDiff2 = Math.abs(currentPhi - oppositePhi);
+  const thetaDiffWrapped2 = Math.min(thetaDiff2, 360 - thetaDiff2);
 
-  if (
-    thetaDiffWrapped <= COORDINATE_TOLERANCE &&
-    phiDiff <= COORDINATE_TOLERANCE
-  ) {
+  const atPrimaryAngle =
+    thetaDiffWrapped1 <= COORDINATE_TOLERANCE &&
+    phiDiff1 <= COORDINATE_TOLERANCE;
+
+  const atOppositeAngle =
+    thetaDiffWrapped2 <= COORDINATE_TOLERANCE &&
+    phiDiff2 <= COORDINATE_TOLERANCE;
+
+  if (atPrimaryAngle || atOppositeAngle) {
     proposalMessage.classList.add("visible");
   } else {
     proposalMessage.classList.remove("visible");
