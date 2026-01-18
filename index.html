@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pov</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        overflow: hidden;
+        background: #000;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+      }
+
+      #app {
+        width: 100vw;
+        height: 100vh;
+      }
+
+      canvas {
+        display: block;
+        cursor: grab;
+      }
+
+      canvas:active {
+        cursor: grabbing;
+      }
+
+      #controls {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 20px;
+        border-radius: 12px;
+        color: white;
+        z-index: 100;
+      }
+
+      #controls h2 {
+        margin-bottom: 16px;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.8;
+      }
+
+      .input-group {
+        margin-bottom: 12px;
+      }
+
+      .input-group label {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 12px;
+        opacity: 0.7;
+      }
+
+      .input-group input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        background: rgba(0, 0, 0, 0.3);
+        color: white;
+        font-size: 16px;
+        outline: none;
+      }
+
+      .input-group input:focus {
+        border-color: rgba(255, 255, 255, 0.5);
+      }
+
+      #go-button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 8px;
+        border: none;
+        border-radius: 6px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      #go-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      #go-button:active {
+        transform: translateY(0);
+      }
+
+      #current-coords {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 12px;
+        opacity: 0.6;
+      }
+
+      #proposal-message {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: transparent;
+        font-size: 48px;
+        font-weight: 300;
+        letter-spacing: 4px;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+        pointer-events: none;
+        z-index: 200;
+        background: linear-gradient(
+          135deg,
+          #fff 0%,
+          #e0e7ff 25%,
+          #fff 50%,
+          #c7d2fe 75%,
+          #fff 100%
+        );
+        background-size: 200% 200%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        text-shadow:
+          0 0 10px rgba(255, 255, 255, 0.8),
+          0 0 20px rgba(255, 255, 255, 0.6),
+          0 0 40px rgba(255, 255, 255, 0.4),
+          0 0 80px rgba(200, 220, 255, 0.3);
+        animation: twinkle 3s ease-in-out infinite;
+      }
+
+      @keyframes twinkle {
+        0%, 100% {
+          text-shadow:
+            0 0 10px rgba(255, 255, 255, 0.8),
+            0 0 20px rgba(255, 255, 255, 0.6),
+            0 0 40px rgba(255, 255, 255, 0.4),
+            0 0 80px rgba(200, 220, 255, 0.3);
+          background-position: 0% 50%;
+        }
+        50% {
+          text-shadow:
+            0 0 15px rgba(255, 255, 255, 1),
+            0 0 30px rgba(255, 255, 255, 0.8),
+            0 0 60px rgba(255, 255, 255, 0.5),
+            0 0 100px rgba(200, 220, 255, 0.4);
+          background-position: 100% 50%;
+        }
+      }
+
+      #proposal-message.visible {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <div id="controls">
+      <h2>Coordinates</h2>
+      <div class="input-group">
+        <label for="theta">Theta (0° - 360°)</label>
+        <input type="number" id="theta" value="0" min="0" max="360" step="1" />
+      </div>
+      <div class="input-group">
+        <label for="phi">Phi (0° - 180°)</label>
+        <input type="number" id="phi" value="90" min="0" max="180" step="1" />
+      </div>
+      <button id="go-button">Go!</button>
+      <div id="current-coords">
+        Current: <span id="current-theta">0</span>°,
+        <span id="current-phi">90</span>°
+      </div>
+    </div>
+
+    <div id="proposal-message">Will you marry me?</div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
