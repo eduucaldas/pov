@@ -7,7 +7,7 @@ const CAMERA_DISTANCE = 100;
 const ANIMATION_DURATION = 3000; // ms
 const SECRET_THETA = 142;
 const SECRET_PHI = 68;
-const COORDINATE_TOLERANCE = 1; // degrees
+const COORDINATE_TOLERANCE = 2; // degrees
 
 // Viewing vectors (direction camera looks FROM to see the shape)
 // Horse: visible from initial position (theta=0, phi=90)
