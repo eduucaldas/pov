@@ -7,7 +7,7 @@ const CAMERA_DISTANCE = 100;
 const ANIMATION_DURATION = 3000; // ms
 const SECRET_THETA = 142;
 const SECRET_PHI = 68;
-const COORDINATE_TOLERANCE = 2; // degrees
+const COORDINATE_TOLERANCE = 4; // degrees
 const WARM_THRESHOLD = 45; // degrees - start glowing when this close
 
 // Viewing vectors (direction camera looks FROM to see the shape)
