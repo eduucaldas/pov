@@ -8,6 +8,7 @@ const ANIMATION_DURATION = 3000; // ms
 const SECRET_THETA = 142;
 const SECRET_PHI = 68;
 const COORDINATE_TOLERANCE = 2; // degrees
+const WARM_THRESHOLD = 45; // degrees - start glowing when this close
 
 // Viewing vectors (direction camera looks FROM to see the shape)
 // Horse: visible from initial position (theta=0, phi=90)
@@ -591,6 +592,44 @@ function handleResize(): void {
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
+// Calculate angular distance to nearest secret angle
+function getDistanceToSecret(): number {
+  // Distance to primary angle
+  const thetaDiff1 = Math.abs(currentTheta - SECRET_THETA);
+  const phiDiff1 = Math.abs(currentPhi - SECRET_PHI);
+  const thetaDiffWrapped1 = Math.min(thetaDiff1, 360 - thetaDiff1);
+  const dist1 = Math.sqrt(thetaDiffWrapped1 ** 2 + phiDiff1 ** 2);
+
+  // Distance to opposite angle
+  const oppositeTheta = (SECRET_THETA + 180) % 360;
+  const oppositePhi = 180 - SECRET_PHI;
+  const thetaDiff2 = Math.abs(currentTheta - oppositeTheta);
+  const phiDiff2 = Math.abs(currentPhi - oppositePhi);
+  const thetaDiffWrapped2 = Math.min(thetaDiff2, 360 - thetaDiff2);
+  const dist2 = Math.sqrt(thetaDiffWrapped2 ** 2 + phiDiff2 ** 2);
+
+  return Math.min(dist1, dist2);
+}
+
+// Update ring star color based on proximity to secret
+function updateRingGlow(): void {
+  if (!ringStars) return;
+
+  const distance = getDistanceToSecret();
+  const material = ringStars.material as THREE.PointsMaterial;
+
+  if (distance >= WARM_THRESHOLD) {
+    // Too far - white
+    material.color.setHex(0xffffff);
+  } else {
+    // Interpolate from white to gold as we get closer
+    const t = 1 - distance / WARM_THRESHOLD; // 0 = far, 1 = close
+    const white = new THREE.Color(0xffffff);
+    const gold = new THREE.Color(0xffd700);
+    material.color.copy(white).lerp(gold, t);
+  }
+}
+
 function animate(): void {
   requestAnimationFrame(animate);
 
@@ -600,6 +639,9 @@ function animate(): void {
     const material = stars.material as THREE.PointsMaterial;
     material.opacity = 0.7 + Math.sin(time) * 0.1;
   }
+
+  // Update ring glow based on proximity
+  updateRingGlow();
 
   renderer.render(scene, camera);
 }
