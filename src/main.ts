@@ -354,7 +354,7 @@ function createRingConstellation(): void {
 
 function createRingStars(vertices: THREE.Vector3[]): void {
   // Sample vertices
-  const ringStarCount = 200;
+  const ringStarCount = 450; // Increased to maintain density at 1.5x size
   const sampledVertices: THREE.Vector3[] = [];
   const step = Math.max(1, Math.floor(vertices.length / ringStarCount));
 
@@ -380,7 +380,7 @@ function createRingStars(vertices: THREE.Vector3[]): void {
 
   // Get viewing direction for ring
   const viewDir = getViewDirection(RING_THETA, RING_PHI);
-  const modelScale = 15 / maxDim;
+  const modelScale = 22.5 / maxDim; // 50% larger than original
 
   // Project and scatter
   const positions = projectAndScatter(centeredVertices, viewDir, modelScale);
