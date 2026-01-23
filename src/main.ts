@@ -10,11 +10,6 @@ const SECRET_PHI = 68;
 const COORDINATE_TOLERANCE = 4; // degrees
 const WARM_THRESHOLD = 45; // degrees - start glowing when this close
 
-// Audio configuration
-const HEARTBEAT_START_THRESHOLD = 45; // degrees - start heartbeat when this close
-const HEARTBEAT_MIN_INTERVAL = 400; // ms - fastest heartbeat (when very close)
-const HEARTBEAT_MAX_INTERVAL = 1500; // ms - slowest heartbeat (when at threshold)
-
 // Viewing vectors (direction camera looks FROM to see the shape)
 // Horse: visible from initial position (theta=0, phi=90)
 const HORSE_THETA = 0;
@@ -39,11 +34,6 @@ let previousMouseY = 0;
 let isLoaded = false;
 let horseLoaded = false;
 let ringLoaded = false;
-
-// Audio state
-let audioContext: AudioContext | null = null;
-let lastHeartbeatTime = 0;
-let audioInitialized = false;
 
 // Three.js objects
 let scene: THREE.Scene;
@@ -413,7 +403,6 @@ function createRingStars(vertices: THREE.Vector3[]): void {
 // Mouse controls
 function handleMouseDown(event: MouseEvent): void {
   if (!isLoaded || isAnimating) return;
-  initAudio(); // Initialize audio on first interaction
   isDragging = true;
   previousMouseX = event.clientX;
   previousMouseY = event.clientY;
@@ -455,7 +444,6 @@ function handleMouseUp(): void {
 // Touch controls
 function handleTouchStart(event: TouchEvent): void {
   if (!isLoaded || isAnimating || event.touches.length !== 1) return;
-  initAudio(); // Initialize audio on first interaction
   isDragging = true;
   const touch = event.touches[0]!;
   previousMouseX = touch.clientX;
@@ -642,77 +630,6 @@ function updateRingGlow(): void {
   }
 }
 
-// Initialize audio context on first user interaction
-function initAudio(): void {
-  if (audioInitialized) return;
-  audioContext = new AudioContext();
-  audioInitialized = true;
-}
-
-// Play a single heartbeat sound (lub-dub)
-function playHeartbeat(volume: number): void {
-  if (!audioContext) return;
-
-  const now = audioContext.currentTime;
-
-  // Create gain node for volume control
-  const gainNode = audioContext.createGain();
-  gainNode.connect(audioContext.destination);
-  gainNode.gain.value = volume * 0.3; // Scale down overall volume
-
-  // First beat (lub) - lower pitch
-  const osc1 = audioContext.createOscillator();
-  const gain1 = audioContext.createGain();
-  osc1.type = "sine";
-  osc1.frequency.value = 60;
-  gain1.gain.setValueAtTime(0, now);
-  gain1.gain.linearRampToValueAtTime(1, now + 0.02);
-  gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-  osc1.connect(gain1);
-  gain1.connect(gainNode);
-  osc1.start(now);
-  osc1.stop(now + 0.15);
-
-  // Second beat (dub) - slightly higher pitch, slightly delayed
-  const osc2 = audioContext.createOscillator();
-  const gain2 = audioContext.createGain();
-  osc2.type = "sine";
-  osc2.frequency.value = 80;
-  gain2.gain.setValueAtTime(0, now + 0.15);
-  gain2.gain.linearRampToValueAtTime(0.7, now + 0.17);
-  gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-  osc2.connect(gain2);
-  gain2.connect(gainNode);
-  osc2.start(now + 0.15);
-  osc2.stop(now + 0.3);
-}
-
-// Update heartbeat based on proximity
-function updateHeartbeat(): void {
-  if (!audioContext || !isLoaded) return;
-
-  const distance = getDistanceToSecret();
-  const now = performance.now();
-
-  // Only play heartbeat when within threshold
-  if (distance >= HEARTBEAT_START_THRESHOLD) {
-    return;
-  }
-
-  // Calculate interval based on distance (closer = faster)
-  const t = distance / HEARTBEAT_START_THRESHOLD; // 0 = very close, 1 = at threshold
-  const interval = HEARTBEAT_MIN_INTERVAL + t * (HEARTBEAT_MAX_INTERVAL - HEARTBEAT_MIN_INTERVAL);
-
-  // Calculate volume based on distance (closer = louder)
-  const volume = 1 - t; // 0 = quiet, 1 = loud
-
-  // Check if enough time has passed for next heartbeat
-  if (now - lastHeartbeatTime >= interval) {
-    playHeartbeat(volume);
-    lastHeartbeatTime = now;
-  }
-}
-
 function animate(): void {
   requestAnimationFrame(animate);
 
@@ -725,9 +642,6 @@ function animate(): void {
 
   // Update ring glow based on proximity
   updateRingGlow();
-
-  // Update heartbeat based on proximity
-  updateHeartbeat();
 
   renderer.render(scene, camera);
 }
